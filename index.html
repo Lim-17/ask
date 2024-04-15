@@ -8,10 +8,11 @@
     <title>Q&A Website</title>
     <link rel="stylesheet" href="style.css">
 
-    <!-- Include Firebase SDK -->
-    <!-- These scripts import Firebase and Firestore libraries. -->
-    <script src="https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.5.0/firebase-firestore.js"></script>
+    <!-- Include Firebase Firestore -->
+    <!-- Import the Firestore SDK -->
+    <script type="module">
+        import { getFirestore, collection, addDoc, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    </script>
 </head>
 
 <body>
@@ -20,9 +21,7 @@
 
     <!-- Form for submitting a new question -->
     <form id="questionForm">
-        <!-- Input field for the question -->
         <input type="text" id="questionInput" placeholder="Type your question..." required>
-        <!-- Submit button for the form -->
         <button type="submit">Submit</button>
     </form>
 
@@ -30,24 +29,16 @@
     <h2>Previous Questions and Answers</h2>
     <div id="answeredQuestions"></div>
 
-    <!-- JavaScript code for interacting with Firebase and Firestore -->
-    <script>
-        // Your Firebase project configuration
-        const firebaseConfig = {
-            apiKey: "your-api-key",
-            authDomain: "your-auth-domain",
-            projectId: "your-project-id",
-            storageBucket: "your-storage-bucket",
-            messagingSenderId: "your-messaging-sender-id",
-            appId: "your-app-id"
-        };
-
-        // Initialize Firebase and Firestore
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(app);
+    <!-- JavaScript code for interacting with Firestore -->
+    <script type="module">
+        // Import the required functions from Firebase Firestore
+        import { getFirestore, collection, addDoc, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        
+        // Initialize Firestore
+        const db = getFirestore(app);
 
         /**
-         * Function to load only answered questions from Firestore and display them on the page.
+         * Function to load only answered questions and display them on the page.
          * It orders the questions from most recent to least recent.
          */
         async function loadAnsweredQuestions() {
@@ -55,22 +46,25 @@
             const answeredQuestionsDiv = document.getElementById('answeredQuestions');
             // Clear any existing content in the div
             answeredQuestionsDiv.innerHTML = '';
-            // Query Firestore for documents where 'answered' is true and order them by 'timestamp' in descending order
-            const querySnapshot = await db.collection('questions')
-                .where('answered', '==', true)
-                .orderBy('timestamp', 'desc')
-                .get();
-
+            
+            // Query Firestore for answered questions ordered by 'timestamp' in descending order
+            const questionsQuery = query(
+                collection(db, 'questions'),
+                where('answered', '==', true),
+                orderBy('timestamp', 'desc')
+            );
+            
+            // Get the query snapshot
+            const querySnapshot = await getDocs(questionsQuery);
+            
             // Iterate over the query results and display each answered question
             querySnapshot.forEach((doc) => {
-                // Get the data from the document
                 const data = doc.data();
-                // Create a div element to hold the question and answer
                 const questionDiv = document.createElement('div');
                 
                 // Format the timestamp to a readable date and time
                 const timestamp = data.timestamp.toDate();
-                const formattedTime = timestamp.toLocaleString(); // Adjust the format as needed
+                const formattedTime = timestamp.toLocaleString();
                 
                 // Create the HTML content for the question and answer
                 questionDiv.innerHTML = `
@@ -88,21 +82,21 @@
          * Handle form submission and save the question to Firestore.
          */
         document.getElementById('questionForm').addEventListener('submit', async (event) => {
-            // Prevent the default form submission behavior
-            event.preventDefault();
-            // Get the question text from the input field
+            event.preventDefault(); // Prevent form submission
+
+            // Get the question input
             const questionInput = document.getElementById('questionInput');
             const question = questionInput.value.trim();
 
-            // If the question is not empty
+            // Add a new question to Firestore
             if (question) {
-                // Add a new document to the `questions` collection with the provided question and default values for answer and answered
-                await db.collection('questions').add({
+                await addDoc(collection(db, 'questions'), {
                     question: question,
                     answer: '',
                     answered: false,
-                    timestamp: firebase.firestore.Timestamp.now() // Set the current time as the timestamp
+                    timestamp: firebase.firestore.Timestamp.now()
                 });
+
                 // Clear the input field
                 questionInput.value = '';
             }
@@ -111,5 +105,25 @@
         // Load answered questions when the page loads
         loadAnsweredQuestions();
     </script>
+
+    <!-- Import and initialize Firebase SDK at the bottom of the body tag -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyABK9kmYoExLI3qoLWU3KKPyudqD7QqmsE",
+            authDomain: "questionanswer-7ad7c.firebaseapp.com",
+            projectId: "questionanswer-7ad7c",
+            storageBucket: "questionanswer-7ad7c.appspot.com",
+            messagingSenderId: "827396179248",
+            appId: "1:827396179248:web:513d2a182fe47c92b774f5"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+    </script>
 </body>
+
 </html>

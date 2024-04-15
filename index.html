@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Questions Website</title>
+    <style>
+        /* Add some basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .question {
+            margin-bottom: 10px;
+        }
+        .answer {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ask a Question</h1>
+
+    <!-- Form for users to submit questions -->
+    <div>
+        <textarea id="questionInput" placeholder="Ask your question here..."></textarea><br>
+        <button onclick="submitQuestion()">Submit Question</button>
+    </div>
+
+    <h2>Answers</h2>
+
+    <!-- Container to display answers -->
+    <div id="answersContainer"></div>
+
+    <script>
+        // Function to submit a question
+        function submitQuestion() {
+            const question = document.getElementById('questionInput').value;
+
+            // Check if the question is empty
+            if (!question) {
+                alert('Please enter a question.');
+                return;
+            }
+
+            // Send the question to the back-end API
+            fetch('https://your-backend-url.com/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question: question }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Clear the question input field
+                document.getElementById('questionInput').value = '';
+                alert('Question submitted successfully.');
+            })
+            .catch(error => {
+                console.error('Error submitting question:', error);
+            });
+        }
+
+        // Function to fetch and display answers
+        function fetchAnswers() {
+            fetch('https://your-backend-url.com/answers')
+            .then(response => response.json())
+            .then(data => {
+                const answersContainer = document.getElementById('answersContainer');
+                answersContainer.innerHTML = '';
+
+                // Display each answer
+                data.answers.forEach(answer => {
+                    const answerDiv = document.createElement('div');
+                    answerDiv.className = 'answer';
+                    answerDiv.innerText = answer;
+                    answersContainer.appendChild(answerDiv);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching answers:', error);
+            });
+        }
+
+        // Fetch answers when the page loads
+        window.onload = fetchAnswers;
+    </script>
+</body>
+</html>

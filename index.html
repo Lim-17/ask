@@ -6,12 +6,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Q&A Website</title>
-    <link rel="stylesheet" href="style.css">
 
-    <!-- Include Firebase Firestore -->
-    <!-- Import the Firestore SDK -->
+    <!-- Import Firebase and Firestore SDKs -->
     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getFirestore, collection, addDoc, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+        // Firebase configuration for your web app
+        const firebaseConfig = {
+            apiKey: "AIzaSyABK9kmYoExLI3qoLWU3KKPyudqD7QqmsE",
+            authDomain: "questionanswer-7ad7c.firebaseapp.com",
+            projectId: "questionanswer-7ad7c",
+            storageBucket: "questionanswer-7ad7c.appspot.com",
+            messagingSenderId: "827396179248",
+            appId: "1:827396179248:web:513d2a182fe47c92b774f5"
+        };
+
+        // Initialize Firebase with your configuration
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
     </script>
 </head>
 
@@ -31,14 +44,14 @@
 
     <!-- JavaScript code for interacting with Firestore -->
     <script type="module">
-        // Import the required functions from Firebase Firestore
-        import { getFirestore, collection, addDoc, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-        
-        // Initialize Firestore
+        // Import necessary functions from Firebase Firestore SDK
+        import { collection, addDoc, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+        // Define the Firestore database instance
         const db = getFirestore(app);
 
         /**
-         * Function to load only answered questions and display them on the page.
+         * Function to load only answered questions from Firestore and display them on the page.
          * It orders the questions from most recent to least recent.
          */
         async function loadAnsweredQuestions() {
@@ -47,7 +60,7 @@
             // Clear any existing content in the div
             answeredQuestionsDiv.innerHTML = '';
             
-            // Query Firestore for answered questions ordered by 'timestamp' in descending order
+            // Query Firestore for answered questions ordered by 'timestamp' in descending order (most recent to least recent)
             const questionsQuery = query(
                 collection(db, 'questions'),
                 where('answered', '==', true),
@@ -104,25 +117,6 @@
 
         // Load answered questions when the page loads
         loadAnsweredQuestions();
-    </script>
-
-    <!-- Import and initialize Firebase SDK at the bottom of the body tag -->
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyABK9kmYoExLI3qoLWU3KKPyudqD7QqmsE",
-            authDomain: "questionanswer-7ad7c.firebaseapp.com",
-            projectId: "questionanswer-7ad7c",
-            storageBucket: "questionanswer-7ad7c.appspot.com",
-            messagingSenderId: "827396179248",
-            appId: "1:827396179248:web:513d2a182fe47c92b774f5"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
     </script>
 </body>
 

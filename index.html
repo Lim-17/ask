@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Basic Web Page</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+
+  <style>
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+      font-family:Roboto;
+    }
+    #page{
+      width:100%;
+      min-width:500px;
+      max-width:750px;
+      margin:0 auto;
+      padding:25px;
+    }
+    #main{
+      padding:25px;
+      border:1px solid black;
+    }
+    form input{
+      border: 1px solid black;
+      border-radius:none;
+      height:36px;
+      font-size:16px;
+    }
+    form input:focus{
+      outline: 1px solid black;
+      outline-radius:none;
+    }
+    #question{
+      width:100%;
+      padding:8px;
+      margin-bottom:8px;
+    }
+    #idkey{
+      width:calc(100% - 82px);
+      padding:8px;
+    }
+    #submit{
+      width:75px;
+      margin-left:3px;
+      background-color:#ccc;
+    }
+    #submit:hover{
+      background-color:#aaa;
+    }
+    #submit:focus{
+      background-color:#ccc;
+    }
+    #instructions{
+      font-weight:500;
+      font-size:36px;
+      margin-bottom:20px;
+    }
+    #answerstitle{
+      margin-top:50px;
+      margin-bottom:25px;
+      font-weight:500;
+      font-size:28px;
+    }
+    #loading{
+      font-size:16px;
+    }
+    .QAquestion{
+      margin-top:20px;
+      font-weight:normal;
+      font-size:18px;
+      color:#777;
+    }
+    .QAquestionDate{
+      font-size:16px;
+      color:#777;      
+    }
+    .QAquestionText{
+      font-size:18px;
+      color:#000;
+    }
+    .QAquestionUser{
+      font-size:16px;
+      color:#777;
+    }
+    .QAanswer{
+      margin-top:6px;
+      font-size:16px;
+      color:#000;
+    }
+  </style>
+
+</head>
+<body>
+  <div id='page'>
+  <div id='main'>
+    <form id='form'>
+      <h1 id='instructions'>ask a question</h1>
+      <input name='question' placeholder='question' id='question'>
+      <input name='source' type='hidden' value='codecademy'>
+      <input name='key' placeholder='identification key (for registered users)' id='idkey'>
+      <input type='submit' value='ask' id='submit'>
+    </form>
+
+      <div id='answers'>
+        <h2 id='answerstitle'>answers <!--<span class='QAquestionDate'>mm/dd/yyyy</span>--></h2>
+        <p id='loading'>loading . . .</p>
+      </div>
+    </div>
+  </div>
+
+
+<script>
+   const form = document.querySelector("#form")
+   const questionEl = document.querySelector('#question')
+   const submitButton = document.querySelector("#submit")
+   const scriptURL = 'https://script.google.com/macros/s/AKfycbyAb2h7G7Ja5R4p2S32CvVQx6KE0ZT_bzqnvcYIOpijPM_i-vZPCmLJlLa4nLSHHX6qIg/exec'
+   form.addEventListener('submit', e => {
+      submitButton.disabled = true
+      e.preventDefault()
+      let requestBody = new FormData(form)
+      fetch(scriptURL, { method: 'POST', body: requestBody})
+        .then(response => {
+            questionEl.value='';
+            alert('question asked', response)
+            submitButton.disabled = false
+          })
+        .catch(error => {
+        alert('question failed', error.message)
+          submitButton.disabled = false
+        }
+        )
+   })
+
+////////////////////////////////////////
+////////////////////////////////////////
+
+const loadingEl = document.getElementById('loading')
+//gets data from script
+fetch('https://script.google.com/macros/s/AKfycbxC_7esS8PEMfXCM2oQRUkbbJRKDxJk02C9Eb3WZFhgqp2g0KZBmGuqrbZon0Zt_wTk/exec')
+    .then(response => response.json())
+    .then(data => {
+        //checks for data and removes loading text
+        if (data && data.length > 0) {
+            const container = document.getElementById('answers');
+            loadingEl.remove();
+//iterates over each row
+data.forEach(row => {
+  //checks that the row isn't the header row
+  if (row[0] != 'Date') {
+    //creates new element for question
+    let currQuestion = document.createElement('h3'); currQuestion.className = 'QAquestion';
+      //creates new span for date
+      let questionDate = document.createElement('span'); questionDate.textContent = row[0]; questionDate.className = 'QAquestionDate';
+      //for actual question
+      let questionText = document.createElement('span'); questionText.textContent = ' '+row[2]+' '; questionText.className = 'QAquestionText';
+      //appends all spans to question element
+      currQuestion.appendChild(questionDate);
+      currQuestion.appendChild(questionText);
+      //checks if user column is specified
+      if (row[4]){
+        let questionUser = document.createElement('span'); questionUser.textContent = row[4]; questionUser.className = 'QAquestionUser';
+          //creates new span for user and appends
+          currQuestion.appendChild(questionUser);
+      }
+    //appends new question to questions page
+    container.appendChild(currQuestion);
+    //creates new span for answer
+    let p = document.createElement('p'); p.className = 'QAanswer'
+    //creates new span for arrow and appends
+    let arrow = document.createElement('span'); arrow.textContent = '→ '; arrow.style.color = '#777'; 
+    p.appendChild(arrow);
+    //creates new span for answer text and appends and appends all
+    let answerText = document.createElement('span'); answerText.textContent = row[3]; p.appendChild(answerText);
+    container.appendChild(p);
+  }
+            });
+        } else {alert('problem loading questions')}
+    })
+    .catch(error => {console.log('Error fetching data: ' + error)}
+    );
+
+</script>
+</body>
+</html>

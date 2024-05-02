@@ -24,6 +24,7 @@
     #main{
       padding:25px;
       border:1px solid black;
+      margin-bottom:calc(100vh - 117.8px);
     }
     form input{
       border: 1px solid black;
@@ -62,15 +63,16 @@
     }
     #answerstitle{
       margin-top:50px;
-      margin-bottom:25px;
+      margin-bottom:5px;
       font-weight:500;
       font-size:28px;
     }
     #loading{
       font-size:16px;
+      padding-top:20px;
     }
     .QAquestion{
-      margin-top:20px;
+      padding-top:20px;
       font-weight:normal;
       font-size:18px;
       color:#777;
@@ -153,7 +155,7 @@ data.forEach(row => {
   //checks that the row isn't the header row
   if (row[0] != 'Date') {
     //creates new element for question
-    let currQuestion = document.createElement('h3'); currQuestion.className = 'QAquestion';
+    let currQuestion = document.createElement('h3'); currQuestion.className = 'QAquestion';currQuestion.id = row[0].replace(/ /g, '-');
       //creates new span for date
       let questionDate = document.createElement('span'); questionDate.textContent = row[0]; questionDate.className = 'QAquestionDate';
       //for actual question
@@ -175,7 +177,7 @@ data.forEach(row => {
     let arrow = document.createElement('span'); arrow.textContent = '→ '; arrow.style.color = '#777'; 
     p.appendChild(arrow);
     //creates new span for answer text and appends and appends all
-    let answerText = document.createElement('span'); answerText.textContent = row[3]; p.appendChild(answerText);
+    let answerText = document.createElement('span'); answerText.innerHTML = row[3]; p.appendChild(answerText);
     container.appendChild(p);
   }
             });
